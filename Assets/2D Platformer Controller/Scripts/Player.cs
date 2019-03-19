@@ -12,6 +12,10 @@ public class Player : MonoBehaviour
     public float accelerationTimeAirborne = .2f;
     public float accelerationTimeGrounded = .1f;
 
+    public Vector3 startPosition;
+
+    public static Player Instance;
+
     private Health health;
     private Controller2D controller;
     private SpriteRenderer spriteRenderer;
@@ -27,6 +31,10 @@ public class Player : MonoBehaviour
 
     private void Start()
     {
+        Instance = this;
+
+        startPosition = transform.position;
+
         health = GetComponent<Health>();
         controller = GetComponent<Controller2D>();
         spriteRenderer = GetComponentInChildren<SpriteRenderer>();
@@ -34,10 +42,10 @@ public class Player : MonoBehaviour
         health.Die += OnDeath;
     }
 
-    private void OnDeath()
+    public void OnDeath()
     {
-        Debug.Log("I equals dead.");
-        Destroy(gameObject);
+        transform.position = startPosition;
+        GameManager.Instance.Reset();
     }
 
     private void Update()
@@ -68,6 +76,7 @@ public class Player : MonoBehaviour
         if (controller.collisions.below)
         {
             velocity.y = maxJumpVelocity;
+            GameManager.Instance.audioManager.PlayJumpSound();
         }
     }
 
@@ -75,7 +84,7 @@ public class Player : MonoBehaviour
     {
         if (collision.gameObject.tag == "Enemy")
         {
-            health.TakeDamage(25);
+            health.TakeDamage(100);
 
             velocity.y = maxJumpVelocity;
             velocity.x = (-Vector3.Normalize(collision.gameObject.transform.position - gameObject.transform.position) * rebounceStrenght).x;

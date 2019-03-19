@@ -11,11 +11,13 @@ public class Destroyer : MonoBehaviour
         if (collision.gameObject.tag != "Player")
         {
             Destroy(collision.gameObject);
-
-            if (collision.gameObject.tag == "Enemy")
-            {
-                gameManager.BugReachedDoor();
-            }
+            GameManager.Instance.BugReachedDoor();
         }
+        else
+        {
+            var player = collision.gameObject.GetComponent<Player>();
+            player.OnDeath();
+        }
+
     }
 }

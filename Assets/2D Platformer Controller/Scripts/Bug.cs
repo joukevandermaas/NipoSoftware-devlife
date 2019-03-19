@@ -40,9 +40,10 @@ public class Bug : MonoBehaviour
         moveSpeed = Random.Range(minMoveSpeed, maxMoveSpeed);
     }
 
-    private void OnDeath()
+    public void OnDeath()
     {
         audioManager.PlaySquashedSound();
+        GameManager.Instance.EnemyDied();
         Destroy(gameObject);
     }
 

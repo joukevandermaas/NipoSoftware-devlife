@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 
 public class NPCSpawner : MonoBehaviour
@@ -12,6 +13,9 @@ public class NPCSpawner : MonoBehaviour
     public bool ShouldSpawn = true;
 
     public float nextSpawn = 0f;
+
+    private float actualMinSpawnTime = 0.25f;
+    private float actualMaxSpawnTime = 0.50f;
 
     public float minSpawnTime = 5f;
     public float maxSpawnTime = 10f;
@@ -33,9 +37,17 @@ public class NPCSpawner : MonoBehaviour
         }
     }
 
+    public void KillAllBugs()
+    {
+        foreach(var bug in GetComponentsInChildren<Bug>())
+        {
+            bug.OnDeath();
+        }
+    }
+
     public void SpawnBug()
     {
-        Instantiate(BugPrefab, transform.position, Quaternion.identity);
+        Instantiate(BugPrefab, transform.position, Quaternion.identity, transform);
     }
 
     public void SpawnFeature()
@@ -43,11 +55,16 @@ public class NPCSpawner : MonoBehaviour
         Instantiate(FeaturePrefab, transform.position, Quaternion.identity);
     }
 
+    internal void BugReachesDoor(float decreaseSpawnTimeWhenBugReachesDoor)
+    {
+        minSpawnTime = Mathf.Max(actualMinSpawnTime, minSpawnTime -= decreaseSpawnTimeWhenBugReachesDoor);
+        maxSpawnTime = Mathf.Max(actualMaxSpawnTime, maxSpawnTime -= decreaseSpawnTimeWhenBugReachesDoor);
+    }
+
     private void Spawn()
     {
         if (ShouldSpawn)
         {
-            // change to feature once done.
             SpawnBug();
 
             audioManager.PlayAngryCustomerSound();

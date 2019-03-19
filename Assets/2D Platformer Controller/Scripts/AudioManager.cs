@@ -7,6 +7,7 @@ public class AudioManager : MonoBehaviour
     public AudioClip squashed;
     public AudioClip shoot;
     public AudioClip angryCustomer;
+    public AudioClip jumpSound;
 
     public void PlaySquashedSound()
     {
@@ -21,5 +22,10 @@ public class AudioManager : MonoBehaviour
     public void PlayAngryCustomerSound()
     {
         AudioSource.PlayClipAtPoint(angryCustomer, Vector3.zero);
+    }
+    
+    public void PlayJumpSound()
+    {
+        AudioSource.PlayClipAtPoint(jumpSound, Vector3.zero);
     }
 }
