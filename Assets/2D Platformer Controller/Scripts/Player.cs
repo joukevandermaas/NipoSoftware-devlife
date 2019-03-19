@@ -23,6 +23,8 @@ public class Player : MonoBehaviour
 
     private float velocityXSmoothing;
 
+    public Vector3 facingDirection => spriteRenderer.flipX ? Vector3.right : Vector3.left;
+
     private void Start()
     {
         health = GetComponent<Health>();
@@ -55,7 +57,10 @@ public class Player : MonoBehaviour
         input.y = 0;
         directionalInput = input;
 
-        spriteRenderer.flipX = directionalInput.x > 0;
+        if (directionalInput.x != 0)
+        {
+            spriteRenderer.flipX = directionalInput.x > 0;
+        }
     }
     
     public void OnJumpInputDown()
@@ -68,14 +73,14 @@ public class Player : MonoBehaviour
 
     public void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.tag == "Bug")
+        if (collision.gameObject.tag == "Enemy")
         {
             health.TakeDamage(10);
 
             velocity.y = maxJumpVelocity;
             velocity.x = (-Vector3.Normalize(collision.gameObject.transform.position - gameObject.transform.position) * rebounceStrenght).x;
         }
-        else if (collision.gameObject.tag == "BugWeakness")
+        else if (collision.gameObject.tag == "EnemyWeakness")
         {
             velocity.y = maxJumpVelocity / 2f;
             var bugHealth = collision.gameObject.GetComponent<Health>();
