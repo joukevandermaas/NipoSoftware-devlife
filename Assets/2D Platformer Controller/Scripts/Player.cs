@@ -1,50 +1,46 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 [RequireComponent(typeof(Controller2D))]
+[RequireComponent(typeof(Health))]
 public class Player : MonoBehaviour
 {
     public float maxJumpHeight = 4f;
-    public float minJumpHeight = 1f;
     public float timeToJumpApex = .4f;
+    public float maxJumpVelocity = 6f;
+    public float gravity = -4f;
+    public float rebounceStrenght = 4f;
+
+    private Health health;
+    private Controller2D controller;
+
     private float accelerationTimeAirborne = .2f;
     private float accelerationTimeGrounded = .1f;
     private float moveSpeed = 6f;
 
-    public Vector2 wallJumpClimb;
-    public Vector2 wallJumpOff;
-    public Vector2 wallLeap;
-
-    public bool canDoubleJump;
-    private bool isDoubleJumping = false;
-
-    public float wallSlideSpeedMax = 3f;
-    public float wallStickTime = .25f;
-    private float timeToWallUnstick;
-
-    private float gravity;
-    private float maxJumpVelocity;
-    private float minJumpVelocity;
     private Vector3 velocity;
+    private Vector2 directionalInput;
+
     private float velocityXSmoothing;
 
-    private Controller2D controller;
-
-    private Vector2 directionalInput;
-    private bool wallSliding;
-    private int wallDirX;
 
     private void Start()
     {
+        health = GetComponent<Health>();
         controller = GetComponent<Controller2D>();
-        gravity = -(2 * maxJumpHeight) / Mathf.Pow(timeToJumpApex, 2);
-        maxJumpVelocity = Mathf.Abs(gravity) * timeToJumpApex;
-        minJumpVelocity = Mathf.Sqrt(2 * Mathf.Abs(gravity) * minJumpHeight);
+
+        health.Die += OnDeath;
+    }
+
+    private void OnDeath()
+    {
+        Debug.Log("I equals dead.");
+        Destroy(gameObject);
     }
 
     private void Update()
     {
         CalculateVelocity();
-        HandleWallSliding();
 
         controller.Move(velocity * Time.deltaTime, directionalInput);
 
@@ -56,80 +52,32 @@ public class Player : MonoBehaviour
 
     public void SetDirectionalInput(Vector2 input)
     {
+        input.y = 0;
         directionalInput = input;
     }
-
+    
     public void OnJumpInputDown()
     {
-        if (wallSliding)
-        {
-            if (wallDirX == directionalInput.x)
-            {
-                velocity.x = -wallDirX * wallJumpClimb.x;
-                velocity.y = wallJumpClimb.y;
-            }
-            else if (directionalInput.x == 0)
-            {
-                velocity.x = -wallDirX * wallJumpOff.x;
-                velocity.y = wallJumpOff.y;
-            }
-            else
-            {
-                velocity.x = -wallDirX * wallLeap.x;
-                velocity.y = wallLeap.y;
-            }
-            isDoubleJumping = false;
-        }
         if (controller.collisions.below)
         {
             velocity.y = maxJumpVelocity;
-            isDoubleJumping = false;
         }
-        if (canDoubleJump && !controller.collisions.below && !isDoubleJumping && !wallSliding)
+    }
+
+    public void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.tag == "Bug")
         {
+            health.TakeDamage(10);
+
             velocity.y = maxJumpVelocity;
-            isDoubleJumping = true;
+            velocity.x = (-Vector3.Normalize(collision.gameObject.transform.position - gameObject.transform.position) * rebounceStrenght).x;
         }
-    }
-
-    public void OnJumpInputUp()
-    {
-        if (velocity.y > minJumpVelocity)
+        else if (collision.gameObject.tag == "BugWeakness")
         {
-            velocity.y = minJumpVelocity;
-        }
-    }
-
-    private void HandleWallSliding()
-    {
-        wallDirX = (controller.collisions.left) ? -1 : 1;
-        wallSliding = false;
-        if ((controller.collisions.left || controller.collisions.right) && !controller.collisions.below && velocity.y < 0)
-        {
-            wallSliding = true;
-
-            if (velocity.y < -wallSlideSpeedMax)
-            {
-                velocity.y = -wallSlideSpeedMax;
-            }
-
-            if (timeToWallUnstick > 0f)
-            {
-                velocityXSmoothing = 0f;
-                velocity.x = 0f;
-                if (directionalInput.x != wallDirX && directionalInput.x != 0f)
-                {
-                    timeToWallUnstick -= Time.deltaTime;
-                }
-                else
-                {
-                    timeToWallUnstick = wallStickTime;
-                }
-            }
-            else
-            {
-                timeToWallUnstick = wallStickTime;
-            }
+            velocity.y = maxJumpVelocity / 2f;
+            var bugHealth = collision.gameObject.GetComponent<Health>();
+            bugHealth.TakeDamage(100);
         }
     }
 
