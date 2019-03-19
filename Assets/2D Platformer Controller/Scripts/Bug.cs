@@ -19,7 +19,7 @@ public class Bug : MonoBehaviour
     private Controller2D controller;
     private float velocityXSmoothing;
     private Vector2 velocity;
-    private Vector2 direction = Vector2.right;
+    private Vector2 direction = Vector2.left;
 
     private float accelerationTimeAirborne = .2f;
     private float accelerationTimeGrounded = .1f;

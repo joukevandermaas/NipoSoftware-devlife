@@ -5,17 +5,17 @@ using UnityEngine;
 [RequireComponent(typeof(Health))]
 public class Player : MonoBehaviour
 {
-    public float maxJumpHeight = 4f;
-    public float timeToJumpApex = .4f;
     public float maxJumpVelocity = 6f;
     public float gravity = -4f;
     public float rebounceStrenght = 4f;
 
+    public float accelerationTimeAirborne = .2f;
+    public float accelerationTimeGrounded = .1f;
+
     private Health health;
     private Controller2D controller;
+    private SpriteRenderer spriteRenderer;
 
-    private float accelerationTimeAirborne = .2f;
-    private float accelerationTimeGrounded = .1f;
     private float moveSpeed = 6f;
 
     private Vector3 velocity;
@@ -23,11 +23,11 @@ public class Player : MonoBehaviour
 
     private float velocityXSmoothing;
 
-
     private void Start()
     {
         health = GetComponent<Health>();
         controller = GetComponent<Controller2D>();
+        spriteRenderer = GetComponentInChildren<SpriteRenderer>();
 
         health.Die += OnDeath;
     }
@@ -54,6 +54,8 @@ public class Player : MonoBehaviour
     {
         input.y = 0;
         directionalInput = input;
+
+        spriteRenderer.flipX = directionalInput.x > 0;
     }
     
     public void OnJumpInputDown()
