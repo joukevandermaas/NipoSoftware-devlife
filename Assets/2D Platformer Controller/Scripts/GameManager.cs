@@ -6,6 +6,11 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     public NPCSpawner spawner;
+    public AudioManager audioManager;
+
+    public static GameManager Instance;
+
+    public int Score;
 
     public float spawnBugChance = 0.2f;
     public float spawnBugChanceIncreaseRate = 0.025f;
@@ -20,17 +25,20 @@ public class GameManager : MonoBehaviour
         if(rnd < spawnBugChance)
         {
             SpawnBug();
-            spawnBugChance += spawnBugChanceIncreaseRate;
         }
+
+        spawnBugChance += spawnBugChanceIncreaseRate;
+        audioManager.PlayShootSound();
     }
 
     public void BugReachedDoor()
     {
+
     }
 
-    public void FeatureReachedDoor()
+    public void EnemyDied()
     {
-
+        Score++;
     }
 
 
@@ -42,7 +50,16 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        Instance = this;
+
+        spawner.SpawnBug();
+        spawner.SpawnBug();
+        spawner.SpawnBug();
+        spawner.SpawnBug();
+        spawner.SpawnBug();
+        spawner.SpawnBug();
+        spawner.SpawnBug();
+        audioManager = GetComponent<AudioManager>();
     }
 
     // Update is called once per frame

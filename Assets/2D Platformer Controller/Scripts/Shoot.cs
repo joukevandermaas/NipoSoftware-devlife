@@ -5,6 +5,7 @@ using UnityEngine;
 public class Shoot : MonoBehaviour
 {
     public GameObject projectile;
+    public GameManager gameManager;
     
     public float force = 1000f;
     public float cooldown = 1f;
@@ -28,6 +29,8 @@ public class Shoot : MonoBehaviour
     {
         if (currentCooldown < 0)
         {
+            gameManager.ShotsFired();
+
             var projectileInstance = Instantiate(projectile, position, Quaternion.identity) as GameObject;
             projectileInstance.GetComponent<Rigidbody2D>().AddForce(direction * force);
 

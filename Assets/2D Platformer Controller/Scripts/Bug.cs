@@ -16,7 +16,9 @@ public class Bug : MonoBehaviour
     public List<Sprite> availableSprites = new List<Sprite>();
     public SpriteRenderer spriteRenderer;
 
-    private Controller2D controller;
+    public AudioManager audioManager;
+
+    private Controller2D controller; 
     private float velocityXSmoothing;
     private Vector2 velocity;
     private Vector2 direction = Vector2.left;
@@ -29,21 +31,18 @@ public class Bug : MonoBehaviour
     private bool isFalling = false;
 
     void Start()
-    {            
+    {
+        audioManager = GameManager.Instance.audioManager;
         controller = GetComponent<Controller2D>();
 
         health.Die += OnDeath;
 
         moveSpeed = Random.Range(minMoveSpeed, maxMoveSpeed);
-
-        var sprite = availableSprites[Random.Range(0, availableSprites.Count - 1)];
-
-        spriteRenderer.sprite = sprite;
     }
 
     private void OnDeath()
     {
-        Debug.Log("Buggie is dood");
+        audioManager.PlaySquashedSound();
         Destroy(gameObject);
     }
 
@@ -56,6 +55,11 @@ public class Bug : MonoBehaviour
 
     private void LateUpdate()
     {
+        if(controller.collisions.below)
+        {
+            velocity.y = 0;
+        }
+
         if(controller.collisions.below == false && isFalling == false)
         {
             isFalling = true;
@@ -71,6 +75,7 @@ public class Bug : MonoBehaviour
     private void SwitchDirection()
     {
         direction.x = -direction.x;
+        spriteRenderer.flipX = !spriteRenderer.flipX;
     }
 
     private void CalculateVelocity()

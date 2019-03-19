@@ -23,7 +23,7 @@ public class Player : MonoBehaviour
 
     private float velocityXSmoothing;
 
-    public Vector3 facingDirection => spriteRenderer.flipX ? Vector3.right : Vector3.left;
+    public Vector3 facingDirection => spriteRenderer.flipX ? Vector3.left : Vector3.right;
 
     private void Start()
     {
@@ -59,7 +59,7 @@ public class Player : MonoBehaviour
 
         if (directionalInput.x != 0)
         {
-            spriteRenderer.flipX = directionalInput.x > 0;
+            spriteRenderer.flipX = directionalInput.x < 0;
         }
     }
     
@@ -75,7 +75,7 @@ public class Player : MonoBehaviour
     {
         if (collision.gameObject.tag == "Enemy")
         {
-            health.TakeDamage(10);
+            health.TakeDamage(25);
 
             velocity.y = maxJumpVelocity;
             velocity.x = (-Vector3.Normalize(collision.gameObject.transform.position - gameObject.transform.position) * rebounceStrenght).x;

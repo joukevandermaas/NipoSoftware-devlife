@@ -4,8 +4,18 @@ using UnityEngine;
 
 public class Destroyer : MonoBehaviour
 {
+    public GameManager gameManager;
+
     public void OnCollisionEnter2D(Collision2D collision)
     {
-        Destroy(collision.gameObject);
+        if (collision.gameObject.tag != "Player")
+        {
+            Destroy(collision.gameObject);
+
+            if (collision.gameObject.tag == "Enemy")
+            {
+                gameManager.BugReachedDoor();
+            }
+        }
     }
 }

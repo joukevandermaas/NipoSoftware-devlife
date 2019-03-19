@@ -7,6 +7,7 @@ public class NPCSpawner : MonoBehaviour
 {
     public GameObject BugPrefab;
     public GameObject FeaturePrefab;
+    public AudioManager audioManager;
 
     public bool ShouldSpawn = true;
 
@@ -48,6 +49,8 @@ public class NPCSpawner : MonoBehaviour
         {
             // change to feature once done.
             SpawnBug();
+
+            audioManager.PlayAngryCustomerSound();
 
             CalculateNextSpawn();
         }
